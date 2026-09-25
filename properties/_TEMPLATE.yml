@@ -40,6 +40,13 @@ highlights:
   - Mostly cosmetic — paint, flooring, kitchen and baths
   - Strong rental demand, 5 minutes to I-285
 
+# --- Deal notes for buyers (optional; shows under "Deal Notes") ---
+# Use | and indent each line. A blank line starts a new paragraph.
+notes: |
+  Seller needs a 21-day close. Buyer pays all closing costs.
+
+  Appraisal and inspection report available on request.
+
 # --- Terms ---
 emd: 5000
 close_by: October 15, 2026
@@ -58,6 +65,7 @@ photos:
 photos_and_comps_link: https://example.com/your-google-drive-folder   # optional
 
 # --- Optional overrides ---
+# headline: 3 Bed Flip in Decatur, GA   # default: built from beds, exit and city
 # badge: PRICE DROP                 # default: NEW OFF-MARKET DEAL
 # intro: "Custom opening line..."   # default: "we just locked up this one in <city>..."
 # subject_lines:                    # default: 4 auto-generated options
