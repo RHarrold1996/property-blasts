@@ -171,6 +171,7 @@ def build_one(path, cfg, tmpl):
         details=details, preheader=preheader, website_display=website_display,
         phone_digits=phone_digits, phone=phone, market_name=market_name,
         headline=headline, short=short,
+        notes_paragraphs=[[ln.strip() for ln in par.strip().splitlines()] for par in re.split(r"\n\s*\n", str(p.get("notes") or "").strip()) if par.strip()],
     )
 
     slug = slugify(f"{p['address']} {p['city']}")
