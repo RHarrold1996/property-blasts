@@ -17,6 +17,8 @@
     .price{font-size:34px !important;}
     .btn{display:block !important;width:100% !important;box-sizing:border-box;}
     .hide-m{display:none !important;}
+    .show-m{display:block !important;max-height:none !important;overflow:visible !important;}
+    .h1{font-size:22px !important;}
   }
 </style>
 </head>
@@ -29,26 +31,31 @@
 
 <table role="presentation" class="container" width="600" cellpadding="0" cellspacing="0" border="0" style="width:600px;max-width:600px;background:#FFFFFF;border-radius:8px;overflow:hidden;">
 
-  <!-- HEADER: LOGO + MARKET PHONE -->
+  <!-- HEADER: LOGO + BADGE + MARKET PHONE -->
   <tr>
     <td class="px" style="background:#FFFFFF;padding:18px 32px;border-bottom:4px solid [[ c.orange ]];">
       <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0"><tr>
-        <td valign="middle" width="96" style="padding-right:14px;"><a href="[[ cfg.website ]]" style="text-decoration:none;"><img src="[[ cfg.logo_url ]]" width="88" height="88" alt="[[ cfg.company_name ]]" style="display:block;width:88px;height:88px;border:0;"></a></td>
-        <td valign="middle" align="right">
-          <p style="margin:0;font-size:11px;font-weight:bold;letter-spacing:1.5px;color:#5A6B80;">INVESTOR DEAL ALERT[% if market_name %] · [[ market_name | upper ]][% endif %]</p>
-          <p style="margin:4px 0 0;font-size:22px;font-weight:bold;"><a href="tel:[[ phone_digits ]]" style="color:[[ c.navy ]];text-decoration:none;">[[ phone ]]</a></p>
+        <td valign="middle" width="96" style="padding-right:16px;"><a href="[[ cfg.website ]]" style="text-decoration:none;"><img src="[[ cfg.logo_url ]]" width="88" height="88" alt="[[ cfg.company_name ]]" style="display:block;width:88px;height:88px;border:0;"></a></td>
+        <td valign="middle">
+          <span style="display:inline-block;background:[[ c.orange ]];color:#FFFFFF;font-size:12px;font-weight:bold;letter-spacing:1px;padding:6px 12px;border-radius:4px;">[[ p.badge | default('NEW OFF-MARKET DEAL', true) | upper ]]</span>
+          <p style="margin:8px 0 0;font-size:11px;font-weight:bold;letter-spacing:1.5px;color:#5A6B80;">[% if market_name %][[ market_name | upper ]] [% endif %]INVESTOR ALERT</p>
+          <div class="show-m" style="display:none;max-height:0;overflow:hidden;mso-hide:all;"><p style="margin:6px 0 0;font-size:16px;font-weight:bold;"><a href="tel:[[ phone_digits ]]" style="color:[[ c.navy ]];text-decoration:none;">[[ phone ]]</a></p></div>
+        </td>
+        <td class="hide-m" valign="middle" align="right">
+          <p style="margin:0;font-size:22px;font-weight:bold;"><a href="tel:[[ phone_digits ]]" style="color:[[ c.navy ]];text-decoration:none;">[[ phone ]]</a></p>
           <p style="margin:6px 0 0;font-size:12px;"><a href="[[ cfg.website ]]" style="color:[[ c.blue ]];text-decoration:none;font-weight:bold;">[[ website_display ]]</a></p>
         </td>
       </tr></table>
     </td>
   </tr>
 
-  <!-- BADGE + GREETING -->
+  <!-- HEADLINE + GREETING -->
   <tr>
-    <td class="px" style="padding:28px 32px 8px;">
-      <span style="display:inline-block;background:[[ c.orange ]];color:#FFFFFF;font-size:12px;font-weight:bold;letter-spacing:1px;padding:6px 12px;border-radius:4px;">[[ p.badge | default('NEW OFF-MARKET DEAL', true) | upper ]]</span>
-      <p style="margin:18px 0 0;font-size:16px;line-height:1.5;color:[[ c.navy ]];">
-        [% if p.intro %][[ p.intro ]][% else %]Hey [[ cfg.first_name_merge_field ]], we just locked up this one in <strong>[[ p.city ]]</strong>. You're getting first look before it goes to the wider list.[% endif %]
+    <td class="px" style="padding:24px 32px 8px;">
+      <p class="h1" style="margin:0;font-size:28px;line-height:1.2;font-weight:bold;color:[[ c.navy ]];">[[ headline ]]</p>
+      <p style="margin:8px 0 0;font-size:14px;color:#5A6B80;">Asking [[ short.price ]] &nbsp;·&nbsp; ARV [[ short.arv ]] &nbsp;·&nbsp; <strong style="color:[[ c.orange ]];">[[ short.spread ]] spread</strong></p>
+      <p style="margin:16px 0 0;font-size:16px;line-height:1.5;color:[[ c.navy ]];">
+        [% if p.intro %][[ p.intro ]][% else %]Hey [[ cfg.first_name_merge_field ]], we just locked up this one. You're getting first look before it goes to the wider list.[% endif %]
       </p>
     </td>
   </tr>
