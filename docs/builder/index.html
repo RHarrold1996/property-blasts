@@ -204,6 +204,11 @@ iframe.mobile{width:390px}
     </fieldset>
 
     <fieldset>
+      <legend>Deal notes</legend>
+      <div class="f full"><label for="notes">Notes for buyers</label><textarea id="notes" name="notes" rows="4" placeholder="e.g. Seller needs a 21-day close. Tenant pays $1,400/mo, lease ends March. Foundation report available."></textarea><span class="hint">Shows in the email under "Deal Notes". Leave blank to hide the section. A blank line starts a new paragraph.</span></div>
+    </fieldset>
+
+    <fieldset>
       <legend>Terms</legend>
       <div class="f"><label for="close_by">Close by</label><input id="close_by" name="close_by"></div>
       <div class="f"><label for="title_company">Title company</label><input id="title_company" name="title_company"></div>
@@ -290,7 +295,7 @@ const EXAMPLE = {
   close_by:"October 15, 2026", title_company:"Example Title Co.", showing:"Lockbox, call or text for access", financing:"",
   main_photo:"https://example.com/front.jpg",
   photos:"https://example.com/kitchen.jpg\nhttps://example.com/living-room.jpg",
-  photos_and_comps_link:"https://example.com/photos-and-comps", headline:"", badge:"", intro:""
+  photos_and_comps_link:"https://example.com/photos-and-comps", headline:"", badge:"", notes:"Seller needs a 21-day close. Buyer pays all closing costs.\n\nAppraisal and inspection report available on request.", intro:""
 };
 const KEY = "rbh-blast-draft-v1";
 const form = document.getElementById("deal");
@@ -355,6 +360,7 @@ function buildEmail(p, preview){
     ["Occupancy", p.occupancy], ["Exit", p.exit_strategy], ["Est. Rent", n.rent ? m.rent + "/mo" : ""], ["Condition", p.condition]
   ].filter(([, v]) => String(v ?? "").trim());
   const hl = lines(p.highlights);
+  const notesHtml = String(p.notes || "").trim().split(/\n\s*\n/).map(par => esc(par.trim()).replace(/\n/g, "<br>")).filter(Boolean).join("<br><br>");
   const pre = preheader(p, n);
   const headline = (p.headline || "").trim() || autoHeadline(p);
   const badge = esc((p.badge || "NEW OFF-MARKET DEAL").toUpperCase());
@@ -462,6 +468,14 @@ function buildEmail(p, preview){
         <tr><td valign="top" style="padding:3px 10px 3px 0;color:${c.orange};font-weight:bold;">✓</td><td style="padding:3px 0;">${esc(h)}</td></tr>`).join("")}
       </table>
     </td>
+  </tr>` : ""}${notesHtml ? `
+  <tr>
+    <td class="px" style="padding:22px 32px 0;">
+      <p style="margin:0 0 8px;font-size:16px;font-weight:bold;color:${c.navy};">Deal Notes</p>
+      <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="background:#FFF8F2;border-left:4px solid ${c.orange};border-radius:4px;"><tr>
+        <td style="padding:14px 18px;font-size:14px;line-height:1.6;color:${c.navy};">${notesHtml}</td>
+      </tr></table>
+    </td>
   </tr>` : ""}${gallery.length ? `
   <tr>
     <td class="px" style="padding:22px 32px 0;">
@@ -552,6 +566,7 @@ function toYaml(p){
     row("beds"), row("baths"), row("sqft"), row("year_built"), row("lot_size"),
     row("occupancy"), row("exit_strategy"), row("condition"), "",
     list("highlights", lines(p.highlights)), "",
+    ...(p.notes.trim() ? [`notes: ${JSON.stringify(p.notes.trim())}`, ""] : []),
     row("emd"), row("close_by"), row("title_company"), row("showing"), ...(p.financing.trim() ? [row("financing")] : []), "",
     row("main_photo"), list("photos", lines(p.photos)), row("photos_and_comps_link"),
     ...(p.headline.trim() ? [row("headline")] : []), ...(p.badge.trim() ? [row("badge")] : []), ...(p.intro.trim() ? [row("intro")] : []), ""
