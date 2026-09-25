@@ -156,6 +156,13 @@ def build_one(path, cfg, tmpl):
         f"Closes {p['close_by']}" if p.get("close_by") else "",
     ] if x)
 
+    ex = str(p.get("exit_strategy") or "").lower()
+    kind = "Flip" if "flip" in ex else "BRRRR" if "brrrr" in ex else "Rental" if "rent" in ex else "Deal"
+    place = ", ".join(str(x) for x in (p.get("city"), p.get("state")) if x)
+    beds = str(p.get("beds") or "").strip()
+    headline = str(p.get("headline") or "").strip() or f"{beds + ' Bed ' if beds else 'Off-Market '}{kind}{' in ' + place if place else ''}"
+    short = {k: short_money(v) for k, v in nums.items()}
+
     website_display = re.sub(r"^https?://(www\.)?", "", cfg["website"]).rstrip("/")
     phone_digits = re.sub(r"\D", "", phone)
 
@@ -163,6 +170,7 @@ def build_one(path, cfg, tmpl):
         p=p, cfg=cfg, c=cfg["brand_colors"], money=money, hero=hero, gallery=gallery,
         details=details, preheader=preheader, website_display=website_display,
         phone_digits=phone_digits, phone=phone, market_name=market_name,
+        headline=headline, short=short,
     )
 
     slug = slugify(f"{p['address']} {p['city']}")
@@ -263,7 +271,9 @@ def build_builder(cfg):
         "disclosure": " ".join(str(cfg["disclosure"]).split()),
         "c": cfg.get("brand_colors") or {}, "markets": markets,
     }
-    (DOCS / "builder-config.json").write_text(json.dumps(settings, indent=2))
+    out = json.dumps(settings, indent=2)
+    (DOCS / "builder-config.json").write_text(out)
+    (DOCS / "builder" / "builder-config.json").write_text(out)  # same folder as the page, so the link always resolves
 
 
 def main():
