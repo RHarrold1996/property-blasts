@@ -229,6 +229,7 @@ iframe.mobile{width:390px}
 
     <fieldset>
       <legend>Extras</legend>
+      <div class="f full"><label for="headline">Headline</label><input id="headline" name="headline" placeholder="Leave blank for auto, e.g. 3 Bed Flip in Decatur, GA"></div>
       <div class="f full"><label for="badge">Badge</label><input id="badge" name="badge" list="badgeList" placeholder="NEW OFF-MARKET DEAL"></div>
       <datalist id="badgeList"><option value="NEW OFF-MARKET DEAL"><option value="PRICE DROP"><option value="BACK ON MARKET"><option value="LAST CALL"></datalist>
       <div class="f full"><label for="intro">Custom opening line</label><textarea id="intro" name="intro" rows="2" placeholder="Leave blank for the default greeting"></textarea></div>
@@ -289,7 +290,7 @@ const EXAMPLE = {
   close_by:"October 15, 2026", title_company:"Example Title Co.", showing:"Lockbox, call or text for access", financing:"",
   main_photo:"https://example.com/front.jpg",
   photos:"https://example.com/kitchen.jpg\nhttps://example.com/living-room.jpg",
-  photos_and_comps_link:"https://example.com/photos-and-comps", badge:"", intro:""
+  photos_and_comps_link:"https://example.com/photos-and-comps", headline:"", badge:"", intro:""
 };
 const KEY = "rbh-blast-draft-v1";
 const form = document.getElementById("deal");
@@ -355,8 +356,9 @@ function buildEmail(p, preview){
   ].filter(([, v]) => String(v ?? "").trim());
   const hl = lines(p.highlights);
   const pre = preheader(p, n);
+  const headline = (p.headline || "").trim() || autoHeadline(p);
   const badge = esc((p.badge || "NEW OFF-MARKET DEAL").toUpperCase());
-  const intro = p.intro.trim() ? esc(p.intro.trim()) : `Hey ${CFG.firstName}, we just locked up this one in <strong>${esc(p.city || "[CITY]")}</strong>. You're getting first look before it goes to the wider list.`;
+  const intro = p.intro.trim() ? esc(p.intro.trim()) : `Hey ${CFG.firstName}, we just locked up this one. You're getting first look before it goes to the wider list.`;
   const pairs = (arr) => { const out = []; for (let i = 0; i < arr.length; i += 2) out.push(arr.slice(i, i + 2)); return out; };
 
   const detailRows = pairs(details).map(row => `
@@ -392,6 +394,8 @@ function buildEmail(p, preview){
     .price{font-size:34px !important;}
     .btn{display:block !important;width:100% !important;box-sizing:border-box;}
     .hide-m{display:none !important;}
+    .show-m{display:block !important;max-height:none !important;overflow:visible !important;}
+    .h1{font-size:22px !important;}
   }
 </style>
 </head>
@@ -403,19 +407,24 @@ function buildEmail(p, preview){
   <tr>
     <td class="px" style="background:#FFFFFF;padding:18px 32px;border-bottom:4px solid ${c.orange};">
       <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0"><tr>
-        <td valign="middle" width="96" style="padding-right:14px;"><a href="${CFG.website}" style="text-decoration:none;"><img src="${logo}" width="88" height="88" alt="${CFG.company}" style="display:block;width:88px;height:88px;border:0;"></a></td>
-        <td valign="middle" align="right" style="font-family:Arial,Helvetica,sans-serif;">
-          <p style="margin:0;font-size:11px;font-weight:bold;letter-spacing:1.5px;color:#5A6B80;">INVESTOR DEAL ALERT${mk.name ? ` · ${esc(mk.name.toUpperCase())}` : ""}</p>
-          <p style="margin:4px 0 0;font-size:22px;font-weight:bold;"><a href="tel:${tel}" style="color:${c.navy};text-decoration:none;">${esc(phone)}</a></p>
+        <td valign="middle" width="96" style="padding-right:16px;"><a href="${CFG.website}" style="text-decoration:none;"><img src="${logo}" width="88" height="88" alt="${CFG.company}" style="display:block;width:88px;height:88px;border:0;"></a></td>
+        <td valign="middle">
+          <span style="display:inline-block;background:${c.orange};color:#FFFFFF;font-size:12px;font-weight:bold;letter-spacing:1px;padding:6px 12px;border-radius:4px;">${badge}</span>
+          <p style="margin:8px 0 0;font-size:11px;font-weight:bold;letter-spacing:1.5px;color:#5A6B80;">${mk.name ? esc(mk.name.toUpperCase()) + " " : ""}INVESTOR ALERT</p>
+          <div class="show-m" style="display:none;max-height:0;overflow:hidden;mso-hide:all;"><p style="margin:6px 0 0;font-size:16px;font-weight:bold;"><a href="tel:${tel}" style="color:${c.navy};text-decoration:none;">${esc(phone)}</a></p></div>
+        </td>
+        <td class="hide-m" valign="middle" align="right">
+          <p style="margin:0;font-size:22px;font-weight:bold;"><a href="tel:${tel}" style="color:${c.navy};text-decoration:none;">${esc(phone)}</a></p>
           <p style="margin:6px 0 0;font-size:12px;"><a href="${CFG.website}" style="color:${c.blue};text-decoration:none;font-weight:bold;">${siteDisplay}</a></p>
         </td>
       </tr></table>
     </td>
   </tr>
   <tr>
-    <td class="px" style="padding:28px 32px 8px;">
-      <span style="display:inline-block;background:${c.orange};color:#FFFFFF;font-size:12px;font-weight:bold;letter-spacing:1px;padding:6px 12px;border-radius:4px;">${badge}</span>
-      <p style="margin:18px 0 0;font-size:16px;line-height:1.5;color:${c.navy};">${intro}</p>
+    <td class="px" style="padding:24px 32px 8px;">
+      <p class="h1" style="margin:0;font-size:28px;line-height:1.2;font-weight:bold;color:${c.navy};">${esc(headline)}</p>
+      <p style="margin:8px 0 0;font-size:14px;color:#5A6B80;">${[n.price != null ? "Asking " + short(n.price) : "", n.arv != null ? "ARV " + short(n.arv) : ""].filter(Boolean).join(" &nbsp;·&nbsp; ")}${n.spread != null ? ` &nbsp;·&nbsp; <strong style="color:${c.orange};">${short(n.spread)} spread</strong>` : ""}</p>
+      <p style="margin:16px 0 0;font-size:16px;line-height:1.5;color:${c.navy};">${intro}</p>
     </td>
   </tr>${hero ? `
   <tr>
@@ -499,6 +508,14 @@ function buildEmail(p, preview){
 </html>`;
 }
 
+function autoHeadline(p){
+  const ex = String(p.exit_strategy || "").toLowerCase();
+  const kind = /flip/.test(ex) ? "Flip" : /brrrr/.test(ex) ? "BRRRR" : /rent/.test(ex) ? "Rental" : "Deal";
+  const beds = String(p.beds || "").trim();
+  const place = [p.city, p.state].map(x => String(x || "").trim()).filter(Boolean).join(", ");
+  return `${beds ? beds + " Bed " : "Off-Market "}${kind}${place ? " in " + place : ""}`;
+}
+
 function preheader(p, n){
   return [
     p.beds ? `${p.beds}bd/${p.baths || "?"}ba` : "",
@@ -537,7 +554,7 @@ function toYaml(p){
     list("highlights", lines(p.highlights)), "",
     row("emd"), row("close_by"), row("title_company"), row("showing"), ...(p.financing.trim() ? [row("financing")] : []), "",
     row("main_photo"), list("photos", lines(p.photos)), row("photos_and_comps_link"),
-    ...(p.badge.trim() ? [row("badge")] : []), ...(p.intro.trim() ? [row("intro")] : []), ""
+    ...(p.headline.trim() ? [row("headline")] : []), ...(p.badge.trim() ? [row("badge")] : []), ...(p.intro.trim() ? [row("intro")] : []), ""
   ].join("\n");
 }
 
@@ -668,14 +685,16 @@ try { draft = JSON.parse(localStorage.getItem(KEY) || "null"); } catch (e) {}
 var draftMarket = draft && draft.market;
 
 async function boot(){
-  try {
-    const r = await fetch("../builder-config.json", { cache: "no-store" });
-    if (r.ok) {
+  for (const path of ["builder-config.json", "builder/builder-config.json", "../builder-config.json"]) {
+    try {
+      const r = await fetch(path, { cache: "no-store" });
+      if (!r.ok) continue;
       const j = await r.json();
       CFG = { ...CFG, ...j, c: { ...CFG.c, ...(j.c || {}) } };
       markets = Array.isArray(j.markets) ? j.markets : [];
-    }
-  } catch (e) {}
+      if (markets.length) break;
+    } catch (e) {}
+  }
   if (!markets.length) markets = [{ id: "default", name: "", phone: CFG.phone }];
   renderMarkets();
   if (draft && typeof draft === "object") { fill({ ...EXAMPLE, ...draft }); $("draftNote").textContent = "Your last draft was restored."; }
