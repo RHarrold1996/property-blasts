@@ -14,9 +14,9 @@ markets:
   atlanta:
     name: Atlanta
     phone: 1-470-665-3951
-  # houston:
-  #   name: Houston
-  #   phone: 1-832-346-8571
+  houston:
+    name: Houston
+    phone: 1-832-346-8571
 
 # Where photos stored in the /photos folder are served from.
 # If you list a photo in a property file as just a filename (e.g. "123-main-front.jpg"),
