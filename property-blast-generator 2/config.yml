@@ -1,0 +1,45 @@
+# ------------------------------------------------------------------
+# BRAND SETTINGS — shared by every email. Edit once, applies to all.
+# ------------------------------------------------------------------
+
+company_name: Robert Buys Houses
+website: https://robertbuyshousesnow.com
+buyers_page: https://robertbuyshousesnow.com/buyers
+logo_url: https://robertbuyshousesnow.com/BIMI.png
+phone: 1-888-326-1050            # fallback if a property has no market
+
+# Markets — each property picks one with `market: atlanta`.
+# The phone number in the email comes from the market.
+markets:
+  atlanta:
+    name: Atlanta
+    phone: 1-888-326-1050
+  # houston:
+  #   name: Houston
+  #   phone: 713-555-0100
+
+# Where photos stored in the /photos folder are served from.
+# If you list a photo in a property file as just a filename (e.g. "123-main-front.jpg"),
+# it becomes: photo_base_url + filename.
+# After turning on GitHub Pages (see README), set this to:
+#   https://<your-github-username>.github.io/<repo-name>/photos/
+# Leave blank if you always paste full image URLs (e.g. from GHL Media Library).
+photo_base_url: ""
+
+# GHL merge field for the contact's first name
+first_name_merge_field: "{{contact.first_name}}"
+
+# GHL unsubscribe link merge field
+unsubscribe_merge_field: "{{unsubscribe_link}}"
+
+disclosure: >-
+  Robert Buys Houses is selling its equitable interest in a purchase contract
+  for this property and is not the owner of record. All figures (ARV, repairs,
+  rent, spread) are estimates provided for information only. Buyers must
+  perform their own due diligence. Property sold as-is.
+
+brand_colors:
+  navy: "#224066"
+  blue: "#006EC1"
+  orange: "#FF6F00"
+  gray: "#BDC3CA"
