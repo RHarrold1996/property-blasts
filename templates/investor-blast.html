@@ -135,6 +135,20 @@
   </tr>
   [% endif %]
 
+  [% if notes_paragraphs %]
+  <!-- DEAL NOTES -->
+  <tr>
+    <td class="px" style="padding:22px 32px 0;">
+      <p style="margin:0 0 8px;font-size:16px;font-weight:bold;color:[[ c.navy ]];">Deal Notes</p>
+      <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="background:#FFF8F2;border-left:4px solid [[ c.orange ]];border-radius:4px;"><tr>
+        <td style="padding:14px 18px;font-size:14px;line-height:1.6;color:[[ c.navy ]];">
+          [% for par in notes_paragraphs %][% if not loop.first %]<br><br>[% endif %][% for ln in par %][% if not loop.first %]<br>[% endif %][[ ln ]][% endfor %][% endfor %]
+        </td>
+      </tr></table>
+    </td>
+  </tr>
+  [% endif %]
+
   [% if gallery %]
   <!-- EXTRA PHOTOS -->
   <tr>
