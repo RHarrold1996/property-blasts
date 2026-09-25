@@ -1,0 +1,692 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Deal Blast Builder</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow:wght@400;500;600;700&family=Barlow+Semi+Condensed:wght@600;700&family=JetBrains+Mono:wght@500&display=swap">
+<style>
+:root{
+  --navy:#224066; --blue:#006EC1; --orange:#FF6F00; --steel:#BDC3CA;
+  --bg:#EEF2F6; --surface:#FFFFFF; --sunken:#F5F7FA; --ink:#1A2B40; --muted:#5A6B80;
+  --line:#D9E0E8; --field:#FFFFFF; --focus:#006EC1;
+  --good:#1F8A4C; --good-bg:#E4F4EA; --warn:#B25E00; --warn-bg:#FFF1E0; --bad:#C0352B; --bad-bg:#FBE6E4;
+  --bar:#224066; --bar-ink:#FFFFFF; --stage:#DCE3EB;
+  color-scheme: light;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --bg:#0D1624; --surface:#15223A; --sunken:#111C30; --ink:#E6EDF5; --muted:#9DB0C6;
+    --line:#26364F; --field:#0F1A2C; --focus:#4DA3F0; --blue:#4DA3F0;
+    --good:#5CC98A; --good-bg:#12301F; --warn:#F2A54A; --warn-bg:#35240E; --bad:#F07A70; --bad-bg:#3A1714;
+    --bar:#0A1220; --bar-ink:#FFFFFF; --stage:#0A1220;
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#0D1624; --surface:#15223A; --sunken:#111C30; --ink:#E6EDF5; --muted:#9DB0C6;
+  --line:#26364F; --field:#0F1A2C; --focus:#4DA3F0; --blue:#4DA3F0;
+  --good:#5CC98A; --good-bg:#12301F; --warn:#F2A54A; --warn-bg:#35240E; --bad:#F07A70; --bad-bg:#3A1714;
+  --bar:#0A1220; --bar-ink:#FFFFFF; --stage:#0A1220;
+  color-scheme: dark;
+}
+*{box-sizing:border-box}
+[hidden]{display:none!important}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:"Barlow",system-ui,-apple-system,"Segoe UI",sans-serif;font-size:15px;line-height:1.45}
+h1,h2,h3{font-family:"Barlow Semi Condensed","Barlow",system-ui,sans-serif;text-wrap:balance;margin:0}
+button,input,select,textarea{font:inherit;color:inherit}
+:focus-visible{outline:2px solid var(--focus);outline-offset:2px}
+
+.topbar{position:sticky;top:env(safe-area-inset-top,0px);z-index:10;background:var(--bar);color:var(--bar-ink);border-bottom:4px solid var(--orange)}
+.topbar-in{max-width:1400px;margin:0 auto;padding:12px 16px;display:flex;gap:12px;align-items:center;justify-content:space-between;flex-wrap:wrap}
+.brand{display:flex;flex-direction:column}
+.brand h1{font-size:21px;letter-spacing:.2px}
+.brand h1 span{color:var(--orange)}
+.brand p{margin:0;font-size:12.5px;color:var(--steel)}
+.actions{display:flex;gap:8px;flex-wrap:wrap}
+.btn{border:0;border-radius:6px;padding:9px 14px;font-weight:600;cursor:pointer;font-size:14px;line-height:1.2}
+.btn-primary{background:var(--orange);color:#fff}
+.btn-primary:hover{background:#E86400}
+.btn-ghost{background:transparent;color:var(--bar-ink);box-shadow:inset 0 0 0 1.5px rgba(255,255,255,.45)}
+.btn-ghost:hover{box-shadow:inset 0 0 0 1.5px #fff}
+
+.wrap{max-width:1400px;margin:0 auto;padding-inline:16px;padding-block:18px 40px;display:grid;grid-template-columns:minmax(0,430px) minmax(0,1fr);gap:20px;align-items:start}
+@media (max-width:940px){.wrap{grid-template-columns:minmax(0,1fr)}}
+
+/* form */
+.form{background:var(--surface);border:1px solid var(--line);border-radius:10px;overflow:hidden}
+.form-head{display:flex;justify-content:space-between;align-items:center;gap:8px;padding:12px 16px;background:var(--sunken);border-bottom:1px solid var(--line);flex-wrap:wrap}
+.form-head .note{font-size:12.5px;color:var(--muted)}
+.linkbtn{background:none;border:0;padding:4px 0;color:var(--blue);font-weight:600;cursor:pointer;font-size:13px}
+fieldset{border:0;margin:0;padding:14px 16px 16px;border-bottom:1px solid var(--line);display:grid;grid-template-columns:1fr 1fr;gap:10px 12px}
+fieldset:last-child{border-bottom:0}
+legend{float:left;width:100%;padding:0;margin-bottom:2px;font-family:"Barlow Semi Condensed",sans-serif;font-weight:700;font-size:12px;letter-spacing:1.2px;text-transform:uppercase;color:var(--muted);grid-column:1/-1}
+.f{display:flex;flex-direction:column;gap:4px;min-width:0}
+.f.full{grid-column:1/-1}
+.f label{font-size:12.5px;font-weight:600;color:var(--muted)}
+.f label .req{color:var(--orange)}
+.f input,.f textarea,.f select{width:100%;background:var(--field);border:1px solid var(--line);border-radius:6px;padding:8px 10px;font-size:14.5px}
+.f textarea{resize:vertical;min-height:92px;line-height:1.4}
+.f input:focus,.f textarea:focus{border-color:var(--focus);outline:none;box-shadow:0 0 0 3px color-mix(in srgb,var(--focus) 22%,transparent)}
+.hint,.f .hint{font-size:11.5px;color:var(--muted)}
+.money{font-family:"JetBrains Mono",ui-monospace,monospace;font-size:13.5px !important}
+@media (max-width:420px){fieldset{grid-template-columns:1fr}}
+.full{grid-column:1/-1}
+.mk{display:flex;flex-direction:column;gap:8px;background:var(--sunken);border:1px solid var(--line);border-radius:8px;padding:10px}
+.mk-rows{display:flex;flex-direction:column;gap:6px}
+.mk-row{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr) auto auto;gap:6px;align-items:center}
+.mk-new{grid-template-columns:minmax(0,1fr) minmax(0,1fr) auto}
+.mk-row input{width:100%;background:var(--field);border:1px solid var(--line);border-radius:6px;padding:6px 8px;font-size:13.5px;min-width:0}
+.mk-del:hover{border-color:var(--bad);color:var(--bad)}
+.mk-add{background:var(--navy);color:#fff;border-color:var(--navy)}
+.mk-add:hover{color:#fff;opacity:.9}
+@media (max-width:420px){.mk-row,.mk-new{grid-template-columns:1fr 1fr}}
+
+/* right column */
+.right{display:flex;flex-direction:column;gap:16px;min-width:0}
+@media (min-width:941px){.right{position:sticky;top:calc(env(safe-area-inset-top,0px) + 86px)}}
+.math{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:1px;background:var(--line);border:1px solid var(--line);border-radius:10px;overflow:hidden}
+.m{background:var(--surface);padding:12px 14px;display:flex;flex-direction:column;gap:3px;min-width:0}
+.m .k{font-size:11px;letter-spacing:1.1px;text-transform:uppercase;color:var(--muted);font-weight:600}
+.m .v{font-family:"JetBrains Mono",ui-monospace,monospace;font-size:18px;font-variant-numeric:tabular-nums;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.chip{align-self:flex-start;font-size:11.5px;font-weight:700;padding:2px 8px;border-radius:999px}
+.chip.good{background:var(--good-bg);color:var(--good)}
+.chip.warn{background:var(--warn-bg);color:var(--warn)}
+.chip.bad{background:var(--bad-bg);color:var(--bad)}
+@media (max-width:640px){.math{grid-template-columns:repeat(2,minmax(0,1fr))}}
+
+.stage{background:var(--stage);border-radius:10px;border:1px solid var(--line);overflow:hidden}
+.stage-head{display:flex;justify-content:space-between;align-items:center;gap:10px;padding:10px 14px;background:var(--surface);border-bottom:1px solid var(--line);flex-wrap:wrap}
+.stage-head h2{font-size:16px}
+.stage-head .sub{font-size:12px;color:var(--muted)}
+.seg{display:inline-flex;border:1px solid var(--line);border-radius:6px;overflow:hidden}
+.seg button{background:var(--surface);border:0;padding:6px 12px;font-size:13px;font-weight:600;cursor:pointer;color:var(--muted)}
+.seg button[aria-pressed="true"]{background:var(--navy);color:#fff}
+.frame-wrap{padding:18px 12px;display:flex;justify-content:center;overflow-x:auto}
+iframe{border:0;width:640px;max-width:100%;height:1400px;background:#EEF1F4;border-radius:6px;transition:width .2s}
+iframe.mobile{width:390px}
+@media (prefers-reduced-motion:reduce){iframe{transition:none}}
+
+.panel{background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:14px 16px}
+.panel h2{font-size:16px;margin-bottom:8px}
+.lines{list-style:none;margin:0;padding:0}
+.lines li{display:flex;gap:10px;align-items:center;justify-content:space-between;padding:7px 0;border-bottom:1px solid var(--line);font-size:14px}
+.lines li:last-child{border-bottom:0}
+.lines .tag{font-size:10.5px;letter-spacing:1px;text-transform:uppercase;color:var(--muted);font-weight:700;margin-right:6px}
+.mini{flex:none;background:transparent;border:1px solid var(--line);border-radius:5px;padding:4px 10px;font-size:12px;font-weight:600;cursor:pointer}
+.mini:hover{border-color:var(--blue);color:var(--blue)}
+
+.fallback{position:fixed;inset:0;background:rgba(10,18,32,.6);display:flex;align-items:center;justify-content:center;padding:16px;z-index:30}
+.fallback-box{background:var(--surface);border-radius:10px;padding:16px;width:min(720px,100%);display:flex;flex-direction:column;gap:10px}
+.fallback-box textarea{width:100%;height:50vh;font-family:"JetBrains Mono",monospace;font-size:12px;background:var(--field);border:1px solid var(--line);border-radius:6px;padding:10px}
+.fallback-box .row{display:flex;justify-content:space-between;align-items:center;gap:10px}
+
+#toast{position:fixed;left:50%;bottom:calc(20px + env(safe-area-inset-bottom,0px));transform:translateX(-50%) translateY(10px);background:var(--navy);color:#fff;padding:10px 16px;border-radius:6px;font-weight:600;opacity:0;pointer-events:none;transition:.18s;z-index:40}
+#toast.on{opacity:1;transform:translateX(-50%) translateY(0)}
+</style>
+</head>
+<body>
+
+
+<header class="topbar">
+  <div class="topbar-in">
+    <div class="brand">
+      <h1>Robert <span>Buys</span> Houses · Deal Blast Builder</h1>
+      <p>Fill in the deal on the left. The investor email updates as you type.</p>
+    </div>
+    <div class="actions">
+      <button class="btn btn-ghost" id="copyYaml" type="button">Copy as repo file (.yml)</button>
+      <button class="btn btn-primary" id="copyHtml" type="button">Copy email HTML</button>
+    </div>
+  </div>
+</header>
+
+<main class="wrap">
+  <form class="form" id="deal" autocomplete="off">
+    <div class="form-head">
+      <span class="note" id="draftNote">Example deal loaded. Replace it with yours.</span>
+      <span>
+        <button class="linkbtn" type="button" id="loadExample">Load example</button>
+        &nbsp;·&nbsp;
+        <button class="linkbtn" type="button" id="clearAll">Clear form</button>
+      </span>
+    </div>
+
+    <fieldset>
+      <legend>Market</legend>
+      <div class="f full">
+        <label for="market">Send as</label>
+        <select id="market" name="market"></select>
+        <span class="hint" id="marketHint">The phone number in the email follows the market you pick. To add or change a market, edit <code>config.yml</code> in GitHub.</span>
+      </div>
+    </fieldset>
+
+    <fieldset>
+      <legend>Location</legend>
+      <div class="f full"><label for="address">Street address <span class="req">*</span></label><input id="address" name="address"></div>
+      <div class="f"><label for="city">City <span class="req">*</span></label><input id="city" name="city"></div>
+      <div class="f"><label for="state">State <span class="req">*</span></label><input id="state" name="state" maxlength="2"></div>
+      <div class="f"><label for="zip">ZIP</label><input id="zip" name="zip" inputmode="numeric"></div>
+      <div class="f"><label for="neighborhood">Neighborhood</label><input id="neighborhood" name="neighborhood"></div>
+    </fieldset>
+
+    <fieldset>
+      <legend>Numbers</legend>
+      <div class="f"><label for="price">Asking price <span class="req">*</span></label><input class="money" id="price" name="price" inputmode="decimal"></div>
+      <div class="f"><label for="arv">ARV <span class="req">*</span></label><input class="money" id="arv" name="arv" inputmode="decimal"></div>
+      <div class="f"><label for="repairs">Est. repairs <span class="req">*</span></label><input class="money" id="repairs" name="repairs" inputmode="decimal"></div>
+      <div class="f"><label for="spread">Spread override</label><input class="money" id="spread" name="spread" inputmode="decimal" placeholder="auto"></div>
+      <div class="f"><label for="rent">Est. rent / mo</label><input class="money" id="rent" name="rent" inputmode="decimal"></div>
+      <div class="f"><label for="emd">EMD</label><input class="money" id="emd" name="emd" inputmode="decimal"></div>
+      <p class="f full hint" style="margin:0">Type money any way: 185000, 185,000 or $185k.</p>
+    </fieldset>
+
+    <fieldset>
+      <legend>Property details</legend>
+      <div class="f"><label for="beds">Beds</label><input id="beds" name="beds" inputmode="decimal"></div>
+      <div class="f"><label for="baths">Baths</label><input id="baths" name="baths" inputmode="decimal"></div>
+      <div class="f"><label for="sqft">Sq ft</label><input id="sqft" name="sqft" inputmode="numeric"></div>
+      <div class="f"><label for="year_built">Year built</label><input id="year_built" name="year_built" inputmode="numeric"></div>
+      <div class="f"><label for="lot_size">Lot size</label><input id="lot_size" name="lot_size"></div>
+      <div class="f"><label for="occupancy">Occupancy</label><input id="occupancy" name="occupancy" list="occList"></div>
+      <div class="f"><label for="exit_strategy">Exit</label><input id="exit_strategy" name="exit_strategy" list="exitList"></div>
+      <div class="f"><label for="condition">Condition</label><input id="condition" name="condition" list="condList"></div>
+      <datalist id="occList"><option value="Vacant"><option value="Tenant occupied"><option value="Owner occupied"></datalist>
+      <datalist id="exitList"><option value="Flip"><option value="BRRRR"><option value="Rental"><option value="Flip or BRRRR"></datalist>
+      <datalist id="condList"><option value="Light rehab"><option value="Medium rehab"><option value="Heavy rehab"><option value="Full gut"></datalist>
+    </fieldset>
+
+    <fieldset>
+      <legend>Why this deal works</legend>
+      <div class="f full"><label for="highlights">One bullet per line</label><textarea id="highlights" name="highlights" rows="5"></textarea></div>
+    </fieldset>
+
+    <fieldset>
+      <legend>Terms</legend>
+      <div class="f"><label for="close_by">Close by</label><input id="close_by" name="close_by"></div>
+      <div class="f"><label for="title_company">Title company</label><input id="title_company" name="title_company"></div>
+      <div class="f full"><label for="showing">Showing</label><input id="showing" name="showing"></div>
+      <div class="f full"><label for="financing">Financing</label><input id="financing" name="financing" placeholder="Cash or hard money only"></div>
+    </fieldset>
+
+    <fieldset>
+      <legend>Photos &amp; links</legend>
+      <div class="f full">
+        <label for="main_photo">Main photo URL</label>
+        <input id="main_photo" name="main_photo" inputmode="url" placeholder="Paste the image link from GHL Media Library">
+        <span class="hint">GHL: Media Library → Upload → click the photo → Copy link. Paste it here.</span>
+      </div>
+      <div class="f full">
+        <label for="mainPhotoFile">See it in the preview (optional)</label>
+        <input id="mainPhotoFile" type="file" accept="image/*">
+        <span class="hint">Pick the same photo from your computer to see it below. This only affects the preview; the email uses the link above.</span>
+      </div>
+      <div class="f full"><label for="photos">More photo URLs, one per line</label><textarea id="photos" name="photos" rows="3"></textarea><span class="hint">These show in a 2-column grid under the highlights.</span></div>
+      <div class="f full"><label for="photos_and_comps_link">"See all photos &amp; comps" link</label><input id="photos_and_comps_link" name="photos_and_comps_link" inputmode="url"></div>
+    </fieldset>
+
+    <fieldset>
+      <legend>Extras</legend>
+      <div class="f full"><label for="badge">Badge</label><input id="badge" name="badge" list="badgeList" placeholder="NEW OFF-MARKET DEAL"></div>
+      <datalist id="badgeList"><option value="NEW OFF-MARKET DEAL"><option value="PRICE DROP"><option value="BACK ON MARKET"><option value="LAST CALL"></datalist>
+      <div class="f full"><label for="intro">Custom opening line</label><textarea id="intro" name="intro" rows="2" placeholder="Leave blank for the default greeting"></textarea></div>
+    </fieldset>
+  </form>
+
+  <section class="right">
+    <div class="math" aria-live="polite">
+      <div class="m"><span class="k">Spread</span><span class="v" id="mSpread">–</span><span class="chip" id="mSpreadChip"></span></div>
+      <div class="m"><span class="k">Spread % of ARV</span><span class="v" id="mPct">–</span></div>
+      <div class="m"><span class="k">70% rule MAO</span><span class="v" id="mMao">–</span><span class="chip" id="mMaoChip"></span></div>
+      <div class="m"><span class="k">All-in cost</span><span class="v" id="mAllIn">–</span></div>
+    </div>
+
+    <div class="stage">
+      <div class="stage-head">
+        <div><h2>Email preview</h2><div class="sub">This is exactly what buyers get. Photos load from the links you paste.</div></div>
+        <div class="seg" role="group" aria-label="Preview width">
+          <button type="button" id="vDesk" aria-pressed="true">Desktop</button>
+          <button type="button" id="vMob" aria-pressed="false">Phone</button>
+        </div>
+      </div>
+      <div class="frame-wrap"><iframe id="preview" title="Email preview"></iframe></div>
+    </div>
+
+    <div class="panel">
+      <h2>Subject lines &amp; preview text</h2>
+      <ul class="lines" id="subjects"></ul>
+    </div>
+  </section>
+</main>
+
+<div class="fallback" id="fallback" hidden>
+  <div class="fallback-box">
+    <div class="row"><strong id="fbTitle">Copy this</strong><button class="mini" type="button" id="fbClose">Close</button></div>
+    <textarea id="fbText" readonly></textarea>
+    <span style="font-size:12.5px;color:var(--muted)">Your browser blocked automatic copying. The text is selected: press Ctrl+C (or ⌘C).</span>
+  </div>
+</div>
+<div id="toast" role="status"></div>
+
+<script>
+(() => {
+let CFG = {
+  company: "Robert Buys Houses",
+  website: "https://robertbuyshousesnow.com", buyers: "https://robertbuyshousesnow.com/buyers",
+  logo: "https://robertbuyshousesnow.com/BIMI.png", phone: "1-888-326-1050", market: "",
+  firstName: "{{contact.first_name}}", unsub: "{{unsubscribe_link}}",
+  disclosure: "Robert Buys Houses is selling its equitable interest in a purchase contract for this property and is not the owner of record. All figures (ARV, repairs, rent, spread) are estimates provided for information only. Buyers must perform their own due diligence. Property sold as-is.",
+  c: {navy:"#224066", blue:"#006EC1", orange:"#FF6F00", gray:"#BDC3CA"}
+};
+const EXAMPLE = {
+  address:"123 Example St", city:"Decatur", state:"GA", zip:"30032", neighborhood:"Example Subdivision",
+  price:"145000", arv:"265000", repairs:"45000", spread:"", rent:"1850", emd:"5000",
+  beds:"3", baths:"2", sqft:"1450", year_built:"1978", lot_size:"0.25 acres",
+  occupancy:"Vacant", exit_strategy:"Flip or BRRRR", condition:"Medium rehab",
+  highlights:"Flip comps at $260K–$275K within 0.5 miles in the last 6 months\nRoof replaced 2019, HVAC 2021\nMostly cosmetic: paint, flooring, kitchen and baths\nStrong rental demand, 5 minutes to I-285",
+  close_by:"October 15, 2026", title_company:"Example Title Co.", showing:"Lockbox, call or text for access", financing:"",
+  main_photo:"https://example.com/front.jpg",
+  photos:"https://example.com/kitchen.jpg\nhttps://example.com/living-room.jpg",
+  photos_and_comps_link:"https://example.com/photos-and-comps", badge:"", intro:""
+};
+const KEY = "rbh-blast-draft-v1";
+const form = document.getElementById("deal");
+const $ = id => document.getElementById(id);
+
+// ---------- helpers ----------
+const esc = s => String(s ?? "").replace(/[&<>"']/g, ch => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[ch]));
+function money(v){
+  if (v == null) return null;
+  let s = String(v).trim().toLowerCase().replace(/[$,\s]/g, "");
+  if (!s) return null;
+  let mult = 1;
+  if (s.endsWith("k")) { mult = 1e3; s = s.slice(0,-1); }
+  else if (s.endsWith("m")) { mult = 1e6; s = s.slice(0,-1); }
+  const n = parseFloat(s);
+  return isNaN(n) ? null : Math.round(n * mult);
+}
+const fmt = n => n == null ? "" : (n < 0 ? "−$" : "$") + Math.abs(n).toLocaleString("en-US");
+const short = n => n == null ? "" : n >= 1e6 ? "$" + (n/1e6).toFixed(2).replace(/\.?0+$/,"") + "M" : n >= 1e3 ? "$" + Math.round(n/1e3) + "K" : "$" + n;
+const lines = s => String(s || "").split("\n").map(x => x.trim()).filter(Boolean);
+const siteDisplay = CFG.website.replace(/^https?:\/\/(www\.)?/, "").replace(/\/$/, "");
+
+function ph(w, h, label, bg, fg){
+  const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="${w}" height="${h}" viewBox="0 0 ${w} ${h}"><rect width="100%" height="100%" fill="${bg}"/><text x="50%" y="50%" fill="${fg}" font-family="Arial,sans-serif" font-size="${Math.max(12, Math.round(w/18))}" font-weight="bold" text-anchor="middle" dominant-baseline="middle">${label}</text></svg>`;
+  return "data:image/svg+xml;charset=utf-8," + encodeURIComponent(svg);
+}
+
+let mainPhotoPreview = null;
+
+function read(){
+  const d = {};
+  for (const el of form.elements) if (el.name) d[el.name] = el.value;
+  return d;
+}
+
+function numbers(p){
+  const n = {};
+  for (const k of ["price","arv","repairs","spread","rent","emd"]) n[k] = money(p[k]);
+  if (n.spread == null && n.arv != null && n.price != null && n.repairs != null) n.spread = n.arv - n.price - n.repairs;
+  return n;
+}
+
+// ---------- email template (mirrors templates/investor-blast.html) ----------
+function buildEmail(p, preview){
+  const c = CFG.c, n = numbers(p), m = {};
+  for (const k in n) m[k] = fmt(n[k]);
+  const mk = currentMarket();
+  const phone = mk.phone || CFG.phone, tel = phone.replace(/\D/g, "");
+  const img = (url, i) => {
+    if (!preview) return url;
+    if (i === 0 && mainPhotoPreview) return mainPhotoPreview;
+    if (url && url !== "local" && !/example\.com/.test(url)) return url;
+    return ph(i === 0 ? 1072 : 526, i === 0 ? 640 : 360, i === 0 ? "Main photo" : "Photo " + (i + 1), i === 0 ? "#224066" : "#BDC3CA", i === 0 ? "#FFFFFF" : "#224066");
+  };
+  const logo = CFG.logo;
+  const hero = p.main_photo.trim() || (preview && mainPhotoPreview ? "local" : ""), gallery = lines(p.photos);
+  const addr = esc(p.address || "[STREET ADDRESS]");
+  const bb = [p.beds, p.baths].filter(x => String(x).trim()).join(" / ");
+  const sqft = /^\d+$/.test(String(p.sqft).trim()) ? Number(p.sqft).toLocaleString("en-US") : p.sqft;
+  const details = [
+    ["Beds / Baths", bb], ["Sq Ft", sqft], ["Year Built", p.year_built], ["Lot Size", p.lot_size],
+    ["Occupancy", p.occupancy], ["Exit", p.exit_strategy], ["Est. Rent", n.rent ? m.rent + "/mo" : ""], ["Condition", p.condition]
+  ].filter(([, v]) => String(v ?? "").trim());
+  const hl = lines(p.highlights);
+  const pre = preheader(p, n);
+  const badge = esc((p.badge || "NEW OFF-MARKET DEAL").toUpperCase());
+  const intro = p.intro.trim() ? esc(p.intro.trim()) : `Hey ${CFG.firstName}, we just locked up this one in <strong>${esc(p.city || "[CITY]")}</strong>. You're getting first look before it goes to the wider list.`;
+  const pairs = (arr) => { const out = []; for (let i = 0; i < arr.length; i += 2) out.push(arr.slice(i, i + 2)); return out; };
+
+  const detailRows = pairs(details).map(row => `
+        <tr>${row.map(([l, v]) => `
+          <td class="stack" width="50%" valign="top" style="padding:6px 0;"><span style="color:#5A6B80;">${esc(l)}:</span> <strong>${esc(v)}</strong></td>`).join("")}${row.length === 1 ? `<td class="stack" width="50%"></td>` : ""}
+        </tr>`).join("");
+
+  const galleryRows = pairs(gallery).map((pair, pi) => `
+        <tr>${pair.map((u, i) => `
+          <td class="stack" width="50%" valign="top" style="padding:0 ${i === 0 ? "5px" : "0"} 10px ${i === 0 ? "0" : "5px"};">
+            <img src="${esc(img(u, 1 + pi * 2 + i))}" width="263" alt="${addr} photo" style="display:block;width:100%;height:auto;border-radius:6px;border:0;">
+          </td>`).join("")}${pair.length === 1 ? `<td class="stack" width="50%"></td>` : ""}
+        </tr>`).join("");
+
+  const terms = [];
+  terms.push(esc(p.financing.trim() || "Cash or hard money only") + (n.emd ? ` &nbsp;·&nbsp; EMD: <strong>${m.emd}</strong> (non-refundable)` : ""));
+  const t2 = [p.close_by.trim() ? `Close by: <strong>${esc(p.close_by)}</strong>` : "", p.title_company.trim() ? `Title: ${esc(p.title_company)}` : ""].filter(Boolean).join(" &nbsp;·&nbsp; ");
+  if (t2) terms.push(t2);
+  if (p.showing.trim()) terms.push(`Showing: <strong>${esc(p.showing)}</strong>`);
+
+  return `<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>${addr} — Off-Market Deal</title>
+<style>
+  @media only screen and (max-width:620px){
+    .container{width:100% !important;}
+    .px{padding-left:20px !important;padding-right:20px !important;}
+    .stack{display:block !important;width:100% !important;}
+    .stat{display:block !important;width:100% !important;border-right:none !important;border-bottom:1px solid #E3E7EB !important;}
+    .price{font-size:34px !important;}
+    .btn{display:block !important;width:100% !important;box-sizing:border-box;}
+    .hide-m{display:none !important;}
+  }
+</style>
+</head>
+<body style="margin:0;padding:0;background:#EEF1F4;font-family:Arial,Helvetica,sans-serif;color:${c.navy};">
+<div style="display:none;max-height:0;overflow:hidden;opacity:0;">${esc(pre)}</div>
+<table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="background:#EEF1F4;">
+<tr><td align="center" style="padding:24px 10px;">
+<table role="presentation" class="container" width="600" cellpadding="0" cellspacing="0" border="0" style="width:600px;max-width:600px;background:#FFFFFF;border-radius:8px;overflow:hidden;">
+  <tr>
+    <td class="px" style="background:#FFFFFF;padding:18px 32px;border-bottom:4px solid ${c.orange};">
+      <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0"><tr>
+        <td valign="middle" width="96" style="padding-right:14px;"><a href="${CFG.website}" style="text-decoration:none;"><img src="${logo}" width="88" height="88" alt="${CFG.company}" style="display:block;width:88px;height:88px;border:0;"></a></td>
+        <td valign="middle" align="right" style="font-family:Arial,Helvetica,sans-serif;">
+          <p style="margin:0;font-size:11px;font-weight:bold;letter-spacing:1.5px;color:#5A6B80;">INVESTOR DEAL ALERT${mk.name ? ` · ${esc(mk.name.toUpperCase())}` : ""}</p>
+          <p style="margin:4px 0 0;font-size:22px;font-weight:bold;"><a href="tel:${tel}" style="color:${c.navy};text-decoration:none;">${esc(phone)}</a></p>
+          <p style="margin:6px 0 0;font-size:12px;"><a href="${CFG.website}" style="color:${c.blue};text-decoration:none;font-weight:bold;">${siteDisplay}</a></p>
+        </td>
+      </tr></table>
+    </td>
+  </tr>
+  <tr>
+    <td class="px" style="padding:28px 32px 8px;">
+      <span style="display:inline-block;background:${c.orange};color:#FFFFFF;font-size:12px;font-weight:bold;letter-spacing:1px;padding:6px 12px;border-radius:4px;">${badge}</span>
+      <p style="margin:18px 0 0;font-size:16px;line-height:1.5;color:${c.navy};">${intro}</p>
+    </td>
+  </tr>${hero ? `
+  <tr>
+    <td class="px" style="padding:20px 32px 0;"><img src="${esc(img(hero, 0))}" width="536" alt="${addr} front exterior" style="display:block;width:100%;max-width:536px;height:auto;border-radius:6px;border:0;"></td>
+  </tr>` : ""}
+  <tr>
+    <td class="px" style="padding:22px 32px 6px;">
+      <p style="margin:0;font-size:22px;font-weight:bold;color:${c.navy};">${addr}</p>
+      <p style="margin:4px 0 0;font-size:15px;color:#5A6B80;">${esc(p.city || "[CITY]")}, ${esc(p.state || "[ST]")} ${esc(p.zip)}${p.neighborhood.trim() ? ` &nbsp;·&nbsp; ${esc(p.neighborhood)}` : ""}</p>
+      <p style="margin:18px 0 0;font-size:13px;font-weight:bold;letter-spacing:1px;color:#5A6B80;">ASKING PRICE</p>
+      <p class="price" style="margin:2px 0 0;font-size:40px;font-weight:bold;color:${c.blue};">${m.price || "$[PRICE]"}</p>
+    </td>
+  </tr>
+  <tr>
+    <td class="px" style="padding:18px 32px 4px;">
+      <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="border:1px solid #E3E7EB;border-radius:6px;"><tr>
+        <td class="stat" width="33%" align="center" style="padding:16px 8px;border-right:1px solid #E3E7EB;"><p style="margin:0;font-size:12px;letter-spacing:1px;color:#5A6B80;">ARV</p><p style="margin:4px 0 0;font-size:22px;font-weight:bold;color:${c.navy};">${m.arv || "$[ARV]"}</p></td>
+        <td class="stat" width="33%" align="center" style="padding:16px 8px;border-right:1px solid #E3E7EB;"><p style="margin:0;font-size:12px;letter-spacing:1px;color:#5A6B80;">EST. REPAIRS</p><p style="margin:4px 0 0;font-size:22px;font-weight:bold;color:${c.navy};">${m.repairs || "$[REPAIRS]"}</p></td>
+        <td class="stat" width="33%" align="center" style="padding:16px 8px;background:#FFF4EB;"><p style="margin:0;font-size:12px;letter-spacing:1px;color:#5A6B80;">POTENTIAL SPREAD</p><p style="margin:4px 0 0;font-size:22px;font-weight:bold;color:${c.orange};">${m.spread || "$[SPREAD]"}</p></td>
+      </tr></table>
+      <p style="margin:8px 0 0;font-size:11px;color:#8A97A6;">Spread = ARV − Price − Repairs, before holding/closing costs. Run your own numbers.</p>
+    </td>
+  </tr>${details.length ? `
+  <tr>
+    <td class="px" style="padding:22px 32px 0;">
+      <p style="margin:0 0 10px;font-size:16px;font-weight:bold;color:${c.navy};">Property Details</p>
+      <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="font-size:14px;color:${c.navy};">${detailRows}
+      </table>
+    </td>
+  </tr>` : ""}${hl.length ? `
+  <tr>
+    <td class="px" style="padding:22px 32px 0;">
+      <p style="margin:0 0 10px;font-size:16px;font-weight:bold;color:${c.navy};">Why This Deal Works</p>
+      <table role="presentation" cellpadding="0" cellspacing="0" border="0" style="font-size:14px;line-height:1.5;color:${c.navy};">${hl.map(h => `
+        <tr><td valign="top" style="padding:3px 10px 3px 0;color:${c.orange};font-weight:bold;">✓</td><td style="padding:3px 0;">${esc(h)}</td></tr>`).join("")}
+      </table>
+    </td>
+  </tr>` : ""}${gallery.length ? `
+  <tr>
+    <td class="px" style="padding:22px 32px 0;">
+      <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0">${galleryRows}
+      </table>
+    </td>
+  </tr>` : ""}
+  <tr>
+    <td class="px" style="padding:12px 32px 0;">
+      <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="background:#F4F7FA;border-left:4px solid ${c.blue};border-radius:4px;"><tr>
+        <td style="padding:16px 18px;font-size:14px;line-height:1.7;color:${c.navy};"><strong>Terms</strong><br>${terms.join("<br>")}</td>
+      </tr></table>
+    </td>
+  </tr>
+  <tr>
+    <td class="px" align="center" style="padding:28px 32px 8px;">
+      <p style="margin:0 0 16px;font-size:15px;color:${c.navy};">First to send proof of funds + EMD gets it. <strong>Serious buyers only.</strong></p>
+      <table role="presentation" cellpadding="0" cellspacing="0" border="0"><tr>
+        <td class="stack" style="padding:0 6px 10px;"><a class="btn" href="tel:${tel}" style="display:inline-block;background:${c.orange};color:#FFFFFF;font-size:16px;font-weight:bold;text-decoration:none;padding:14px 26px;border-radius:6px;text-align:center;">Call / Text to Lock It</a></td>${p.photos_and_comps_link.trim() ? `
+        <td class="stack" style="padding:0 6px 10px;"><a class="btn" href="${esc(p.photos_and_comps_link.trim())}" style="display:inline-block;background:${c.blue};color:#FFFFFF;font-size:16px;font-weight:bold;text-decoration:none;padding:14px 26px;border-radius:6px;text-align:center;">See All Photos &amp; Comps</a></td>` : ""}
+      </tr></table>
+      <p style="margin:6px 0 0;font-size:14px;color:#5A6B80;">Or reply to this email &nbsp;·&nbsp; <a href="tel:${tel}" style="color:${c.blue};text-decoration:none;font-weight:bold;">${esc(phone)}</a></p>
+    </td>
+  </tr>
+  <tr>
+    <td class="px" style="background:${c.navy};padding:26px 32px;font-size:11px;line-height:1.6;color:${c.gray};">
+      <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0"><tr>
+        <td valign="middle" width="76" style="padding-right:14px;"><img src="${logo}" width="64" height="64" alt="${CFG.company}" style="display:block;width:64px;height:64px;border:0;"></td>
+        <td valign="middle" style="font-size:13px;color:${c.gray};">${mk.name ? `${esc(mk.name)} deals · ` : ""}<a href="tel:${tel}" style="color:#FFFFFF;text-decoration:none;font-weight:bold;">${esc(phone)}</a><br><a href="${CFG.website}" style="font-size:12px;color:${c.gray};text-decoration:none;">${siteDisplay}</a></td>
+      </tr></table>
+      <p style="margin:16px 0 18px;font-size:12px;">
+        <a href="${CFG.website}" style="color:#FFFFFF;text-decoration:none;font-weight:bold;">Website</a> &nbsp;<span style="color:${c.orange};">|</span>&nbsp;
+        <a href="${CFG.buyers}" style="color:#FFFFFF;text-decoration:none;font-weight:bold;">Buyer List</a> &nbsp;<span style="color:${c.orange};">|</span>&nbsp;
+        <a href="tel:${tel}" style="color:#FFFFFF;text-decoration:none;font-weight:bold;">${esc(phone)}</a>
+      </p>
+      Disclosure: ${esc(CFG.disclosure)}<br><br>
+      <a href="${CFG.unsub}" style="color:${c.gray};">Unsubscribe</a>
+    </td>
+  </tr>
+</table>
+</td></tr>
+</table>
+</body>
+</html>`;
+}
+
+function preheader(p, n){
+  return [
+    p.beds ? `${p.beds}bd/${p.baths || "?"}ba` : "",
+    n.arv != null ? `ARV ${fmt(n.arv)}` : "",
+    n.repairs != null ? `Repairs ~${fmt(n.repairs)}` : "",
+    p.close_by.trim() ? `Closes ${p.close_by.trim()}` : ""
+  ].filter(Boolean).join(" | ");
+}
+
+function subjects(p, n){
+  const city = p.city || "[City]", bb = `${p.beds || "?"}/${p.baths || "?"}`;
+  return [
+    `Off-market: ${city} ${bb} | ${short(n.spread)} spread`,
+    `${CFG.firstName}, ${short(n.spread)} spread in ${city}`,
+    `New ${city} deal: ${short(n.price)} | ARV ${short(n.arv)}`,
+    `First look: ${p.neighborhood.trim() || city} deal before it's gone`
+  ];
+}
+
+function toYaml(p){
+  const q = v => {
+    const s = String(v ?? "").trim();
+    if (!s) return "";
+    if (/^[\d.]+$/.test(s) && !/^0\d/.test(s)) return s;
+    return /[:#\[\]{}&*!|>'"%@`,]|^[-?]/.test(s) || /^\d/.test(s) ? JSON.stringify(s) : s;
+  };
+  const list = (k, arr) => arr.length ? `${k}:\n${arr.map(x => `  - ${q(x)}`).join("\n")}` : `${k}: []`;
+  const row = (k) => `${k}: ${q(p[k])}`;
+  return [
+    "# Generated by Deal Blast Builder — save in the repo's properties/ folder",
+    `market: ${q(currentMarket().name)}`,
+    row("address"), row("city"), row("state"), row("zip"), row("neighborhood"), "",
+    row("price"), row("arv"), row("repairs"), ...(p.spread.trim() ? [row("spread")] : []), row("rent"), "",
+    row("beds"), row("baths"), row("sqft"), row("year_built"), row("lot_size"),
+    row("occupancy"), row("exit_strategy"), row("condition"), "",
+    list("highlights", lines(p.highlights)), "",
+    row("emd"), row("close_by"), row("title_company"), row("showing"), ...(p.financing.trim() ? [row("financing")] : []), "",
+    row("main_photo"), list("photos", lines(p.photos)), row("photos_and_comps_link"),
+    ...(p.badge.trim() ? [row("badge")] : []), ...(p.intro.trim() ? [row("intro")] : []), ""
+  ].join("\n");
+}
+
+// ---------- render ----------
+const frame = $("preview");
+let lastSubjects = [], lastPre = "";
+function render(){
+  const p = read(), n = numbers(p);
+  frame.srcdoc = buildEmail(p, true);
+
+  // deal math strip
+  const setChip = (el, cls, txt) => { el.className = "chip" + (cls ? " " + cls : ""); el.textContent = txt; el.hidden = !txt; };
+  $("mSpread").textContent = n.spread != null ? fmt(n.spread) : "–";
+  const pct = n.spread != null && n.arv ? n.spread / n.arv * 100 : null;
+  $("mPct").textContent = pct != null ? pct.toFixed(1) + "%" : "–";
+  if (n.spread == null) setChip($("mSpreadChip"), "", "");
+  else if (n.spread <= 0) setChip($("mSpreadChip"), "bad", "No spread");
+  else if (pct < 15) setChip($("mSpreadChip"), "warn", "Thin");
+  else setChip($("mSpreadChip"), "good", "Healthy");
+  const mao = n.arv != null && n.repairs != null ? Math.round(n.arv * 0.7 - n.repairs) : null;
+  $("mMao").textContent = mao != null ? fmt(mao) : "–";
+  if (mao == null || n.price == null) setChip($("mMaoChip"), "", "");
+  else if (n.price <= mao) setChip($("mMaoChip"), "good", "Price under MAO");
+  else setChip($("mMaoChip"), "warn", fmt(n.price - mao) + " over");
+  $("mAllIn").textContent = n.price != null && n.repairs != null ? fmt(n.price + n.repairs) : "–";
+
+  // subjects
+  lastSubjects = subjects(p, n); lastPre = preheader(p, n);
+  $("subjects").innerHTML = lastSubjects.map((s, i) =>
+    `<li><span><span class="tag">Subject</span>${esc(s)}</span><button class="mini" type="button" data-copy="s${i}">Copy</button></li>`).join("") +
+    `<li><span><span class="tag">Preview text</span>${esc(lastPre)}</span><button class="mini" type="button" data-copy="pre">Copy</button></li>`;
+}
+
+function fitFrame(){
+  try {
+    const doc = frame.contentDocument;
+    if (doc && doc.body) frame.style.height = Math.max(600, doc.documentElement.scrollHeight + 4) + "px";
+  } catch (e) {}
+}
+frame.addEventListener("load", fitFrame);
+
+// ---------- copy ----------
+const toastEl = $("toast"); let tt;
+function toast(msg){ toastEl.textContent = msg; toastEl.classList.add("on"); clearTimeout(tt); tt = setTimeout(() => toastEl.classList.remove("on"), 1700); }
+function copy(text, label){
+  const fallback = () => {
+    // Inside an iframe (like GHL) the modern clipboard API is often blocked; try the older copy command first
+    const ta = document.createElement("textarea");
+    ta.value = text; ta.setAttribute("readonly", ""); ta.style.cssText = "position:fixed;top:0;left:0;opacity:0;";
+    document.body.appendChild(ta); ta.select();
+    let ok = false; try { ok = document.execCommand("copy"); } catch (e) {}
+    ta.remove();
+    if (ok) { toast(label + " copied"); return; }
+    $("fbTitle").textContent = label; $("fbText").value = text; $("fallback").hidden = false; $("fbText").focus(); $("fbText").select();
+  };
+  try {
+    navigator.clipboard.writeText(text).then(() => toast(label + " copied"), fallback);
+  } catch (e) { fallback(); }
+}
+$("fbClose").addEventListener("click", () => { $("fallback").hidden = true; });
+$("copyHtml").addEventListener("click", () => {
+  const p = read();
+  const missing = ["address","city","state","price","arv","repairs"].filter(k => !String(p[k]).trim());
+  copy(buildEmail(p, false), "Email HTML");
+  if (missing.length) setTimeout(() => toast("Heads up: still missing " + missing.join(", ")), 1800);
+});
+$("copyYaml").addEventListener("click", () => copy(toYaml(read()), "Repo file"));
+$("subjects").addEventListener("click", e => {
+  const b = e.target.closest("[data-copy]"); if (!b) return;
+  const k = b.dataset.copy;
+  copy(k === "pre" ? lastPre : lastSubjects[+k.slice(1)], k === "pre" ? "Preview text" : "Subject line");
+});
+
+// ---------- view toggle ----------
+function setView(mobile){
+  frame.classList.toggle("mobile", mobile);
+  $("vDesk").setAttribute("aria-pressed", String(!mobile));
+  $("vMob").setAttribute("aria-pressed", String(mobile));
+  setTimeout(fitFrame, 250);
+}
+$("vDesk").addEventListener("click", () => setView(false));
+$("vMob").addEventListener("click", () => setView(true));
+
+// ---------- markets (from config.yml via builder-config.json) ----------
+let markets = [];
+const urlMarket = new URLSearchParams(location.search).get("market");
+function currentMarket(){
+  const id = $("market").value;
+  return markets.find(m => m.id === id) || markets[0] || { name: "", phone: CFG.phone };
+}
+function renderMarkets(){
+  const sel = $("market"), keep = sel.value || urlMarket || (draftMarket ?? "");
+  sel.innerHTML = markets.map(m => `<option value="${esc(m.id)}">${esc(m.name)} · ${esc(m.phone)}</option>`).join("");
+  if (markets.some(m => m.id === keep)) sel.value = keep;
+}
+$("market").addEventListener("change", render);
+
+// ---------- main photo preview ----------
+$("mainPhotoFile").addEventListener("change", e => {
+  const f = e.target.files && e.target.files[0];
+  if (!f) { mainPhotoPreview = null; render(); return; }
+  const r = new FileReader();
+  r.onload = () => { mainPhotoPreview = r.result; render(); };
+  r.readAsDataURL(f);
+});
+
+// ---------- fill / draft ----------
+function fill(obj){ for (const el of form.elements) if (el.name) el.value = obj[el.name] ?? ""; render(); }
+let saveT;
+form.addEventListener("input", () => {
+  clearTimeout(saveT);
+  saveT = setTimeout(() => {
+    render();
+    try { localStorage.setItem(KEY, JSON.stringify(read())); } catch (e) {}
+    $("draftNote").textContent = "Draft saved in this browser.";
+  }, 150);
+});
+$("loadExample").addEventListener("click", () => { fill(EXAMPLE); $("draftNote").textContent = "Example deal loaded. Replace it with yours."; });
+$("clearAll").addEventListener("click", () => {
+  const keepMarket = $("market").value;
+  fill({}); $("market").value = keepMarket; mainPhotoPreview = null; $("mainPhotoFile").value = ""; render();
+  try { localStorage.setItem(KEY, JSON.stringify(read())); } catch (e) {}
+  $("draftNote").textContent = "Form cleared. Your market was kept.";
+});
+
+let draft = null;
+try { draft = JSON.parse(localStorage.getItem(KEY) || "null"); } catch (e) {}
+var draftMarket = draft && draft.market;
+
+async function boot(){
+  try {
+    const r = await fetch("../builder-config.json", { cache: "no-store" });
+    if (r.ok) {
+      const j = await r.json();
+      CFG = { ...CFG, ...j, c: { ...CFG.c, ...(j.c || {}) } };
+      markets = Array.isArray(j.markets) ? j.markets : [];
+    }
+  } catch (e) {}
+  if (!markets.length) markets = [{ id: "default", name: "", phone: CFG.phone }];
+  renderMarkets();
+  if (draft && typeof draft === "object") { fill({ ...EXAMPLE, ...draft }); $("draftNote").textContent = "Your last draft was restored."; }
+  else fill(EXAMPLE);
+  const want = urlMarket && markets.some(m => m.id === urlMarket) ? urlMarket : $("market").value;
+  if (!markets.some(m => m.id === want)) $("market").value = markets[0].id; else $("market").value = want;
+  render();
+}
+boot();
+})();
+</script>
+
+</body>
+</html>
