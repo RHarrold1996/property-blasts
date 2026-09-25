@@ -13,10 +13,10 @@ phone: 1-888-326-1050            # fallback if a property has no market
 markets:
   atlanta:
     name: Atlanta
-    phone: 1-888-326-1050
+    phone: 1-470-665-3951
   # houston:
   #   name: Houston
-  #   phone: 713-555-0100
+  #   phone: 1-832-346-8571
 
 # Where photos stored in the /photos folder are served from.
 # If you list a photo in a property file as just a filename (e.g. "123-main-front.jpg"),
