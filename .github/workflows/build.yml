@@ -1,0 +1,54 @@
+name: Build property emails
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - "properties/**"
+      - "templates/**"
+      - "builder/**"
+      - "photos/**"
+      - "config.yml"
+      - "build.py"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: build-emails
+  cancel-in-progress: false
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install
+        run: pip install -r requirements.txt
+
+      - name: Build emails
+        run: python build.py || echo "BUILD_FAILED=1" >> "$GITHUB_ENV"
+
+      - name: Commit generated emails
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898798+github-actions[bot]@users.noreply.github.com"
+          git add -A docs
+          if git diff --cached --quiet; then
+            echo "No changes to commit."
+          else
+            git commit -m "Build emails [skip ci]"
+            git push
+          fi
+
+      - name: Report property file errors
+        if: env.BUILD_FAILED == '1'
+        run: |
+          echo "::error::One or more property files had errors. Open the 'Build emails' step above to see which."
+          exit 1
